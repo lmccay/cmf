@@ -142,7 +142,7 @@ public class BaseKeystoreService {
     }
   }
 
-  protected boolean isKeystoreAvailable(final File keyStoreFile, String storeType) throws KeyStoreException, IOException {
+  protected boolean isKeystoreAvailable(final File keyStoreFile, String storeType) throws KeystoreServiceException, KeyStoreException, IOException {
     if ( keyStoreFile.exists() )
     {
       FileInputStream input = null;
@@ -152,9 +152,9 @@ public class BaseKeystoreService {
         keyStore.load( input, masterService.getMasterSecret() );
         return true;
       } catch (NoSuchAlgorithmException e) {
-        throw new KeystoreService("Problem checking for keystore.", e);
+        throw new KeystoreServiceException("Problem checking for keystore.", e);
       } catch (CertificateException e) {
-        throw new KeystoreService("Problem checking for keystore.", e);
+        throw new KeystoreServiceException("Problem checking for keystore.", e);
       } catch (IOException e) {
         throw e;
       } catch (KeyStoreException e) {

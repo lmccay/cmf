@@ -39,7 +39,7 @@ public interface KeystoreService {
   
   public boolean isCredentialStoreAvailable() throws KeystoreServiceException;
 
-  public boolean isKeystoreAvailable() throws KeystoreServiceException;
+  public boolean isKeystoreAvailable() throws KeystoreServiceException, IOException;
   
   public KeyStore getCredentialStore();
 

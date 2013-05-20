@@ -46,7 +46,7 @@ public class CMFBootstrapService {
 		  // log approrpiate message
 		  System.out.println("CMF Startup Abort: Issue with Keystore.");
 		  // you will want to halt system startup as appropriate for your application
-		  exit(1);
+          System.exit(1);
 		}
 		as = new CMFAliasService(ks);
 	}
@@ -62,13 +62,13 @@ public class CMFBootstrapService {
 		  // log approrpiate message
 		  System.out.println("CMF Startup Abort: Issue with Keystore.");
 		  // you will want to halt system startup as appropriate for you
-		  exit(1);
+          System.exit(1);
 		}
 		catch(MasterServiceException kse) {
 		  // log approrpiate message
 		  System.out.println("CMF Startup Abort: Issue with MasterService.");
 		  // you will want to halt system startup as appropriate for you
-		  exit(1);
+          System.exit(1);
 		}
 	}
 	
