@@ -50,7 +50,12 @@ public class CMFAliasService implements AliasService {
     char[] credential = keystoreService.getCredential(alias);
     if (credential == null) {
       if (generate) {
-        generateAlias(alias);
+        try {
+		  generateAlias(alias);
+		}
+		catch (KeystoreServiceException e) {
+          e.printStackTrace();
+        }
       }
     }
     return credential;
@@ -84,13 +89,13 @@ public class CMFAliasService implements AliasService {
   }
 
   @Override
-  public void generateAlias(String alias) {
+  public void generateAlias(String alias) throws KeystoreServiceException {
     String passwordString = generatePassword(16);
     addAlias(alias, passwordString);
   }
 
   @Override
-  public void addAlias(String alias, String value) {
+  public void addAlias(String alias, String value) throws KeystoreServiceException {
     keystoreService.addCredential(alias, value);
   }
 }

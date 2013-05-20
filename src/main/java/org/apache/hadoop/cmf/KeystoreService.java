@@ -27,15 +27,15 @@ import java.security.cert.CertificateException;
 
 public interface KeystoreService {
 
-  public void createKeystore();
+  public void createKeystore() throws KeystoreServiceException;
 
-  public void addSelfSignedCert(String alias, char[] passphrase);
+  public void addSelfSignedCert(String alias, char[] passphrase) throws KeystoreServiceException;
   
   public KeyStore getKeystore();
   
   public Key getKey(String alias, char[] passphrase) throws KeystoreServiceException;
 
-  public void createCredentialStore();
+  public void createCredentialStore() throws KeystoreServiceException;
   
   public boolean isCredentialStoreAvailable() throws KeystoreServiceException;
 
@@ -43,7 +43,7 @@ public interface KeystoreService {
   
   public KeyStore getCredentialStore();
 
-  public void addCredential(String alias, String key);
+  public void addCredential(String alias, String key) throws KeystoreServiceException;
 
   public char[] getCredential(String alias);
 

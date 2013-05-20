@@ -21,13 +21,13 @@ import java.security.Key;
 
 public interface AliasService {
 
-  void addAlias(String alias, String value);
+  void addAlias(String alias, String value) throws KeystoreServiceException;
 
   char[] getPasswordFromAlias(String alias);
 
   char[] getPasswordFromAlias(String alias, boolean generate);
 
-  void generateAlias(String alias);
+  void generateAlias(String alias) throws KeystoreServiceException;
   
   char[] getPasswordFromConfigValue(String configValue);
 }

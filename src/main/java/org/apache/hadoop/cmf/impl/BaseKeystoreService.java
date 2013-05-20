@@ -40,6 +40,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.hadoop.cmf.MasterService;
 import org.apache.hadoop.cmf.KeystoreService;
+import org.apache.hadoop.cmf.KeystoreServiceException;
 
 import sun.security.x509.AlgorithmId;
 import sun.security.x509.CertificateAlgorithmId;
@@ -62,28 +63,27 @@ public class BaseKeystoreService {
 	setMasterService(ms);
   }
 
-  private static KeyStore loadKeyStore(final File keyStoreFile, final char[] masterPassword, String storeType)
-      throws CertificateException, IOException, KeyStoreException,
-      NoSuchAlgorithmException {     
-      
-       final KeyStore  keyStore = KeyStore.getInstance(storeType);
-       if ( keyStoreFile.exists() )
-       {
-           final FileInputStream   input   = new FileInputStream( keyStoreFile );
-           try {
-               keyStore.load( input, masterPassword );
-           }
-           finally {
-               input.close();
-           }
-       }
-       else
-       {
-           keyStore.load( null, masterPassword );
-       }
-      
-       return keyStore;       
-      }
+  private static KeyStore loadKeyStore(final File keyStoreFile, final char[] masterPassword, String storeType) throws CertificateException, IOException, KeyStoreException,
+   NoSuchAlgorithmException {     
+   
+    final KeyStore  keyStore = KeyStore.getInstance(storeType);
+    if ( keyStoreFile.exists() )
+    {
+        final FileInputStream   input   = new FileInputStream( keyStoreFile );
+        try {
+            keyStore.load( input, masterPassword );
+        }
+        finally {
+            input.close();
+        }
+    }
+    else
+    {
+        keyStore.load( null, masterPassword );
+    }
+   
+    return keyStore;       
+  }
 
   /** 
    * Create a self-signed X.509 Certificate
@@ -92,113 +92,97 @@ public class BaseKeystoreService {
    * @param days how many days from now the Certificate is valid for
    * @param algorithm the signing algorithm, eg "SHA1withRSA"
    */
-  protected X509Certificate generateCertificate(String dn, KeyPair pair, int days,
-      String algorithm) throws GeneralSecurityException, IOException {
-        PrivateKey privkey = pair.getPrivate();
-        X509CertInfo info = new X509CertInfo();
-        Date from = new Date();
-        Date to = new Date(from.getTime() + days * 86400000l);
-        CertificateValidity interval = new CertificateValidity(from, to);
-        BigInteger sn = new BigInteger(64, new SecureRandom());
-        X500Name owner = new X500Name(dn);
+  protected X509Certificate generateCertificate(String dn, KeyPair pair, int days, String algorithm) 
+	throws GeneralSecurityException, IOException {
+	PrivateKey privkey = pair.getPrivate();
+    X509CertInfo info = new X509CertInfo();
+    Date from = new Date();
+    Date to = new Date(from.getTime() + days * 86400000l);
+    CertificateValidity interval = new CertificateValidity(from, to);
+    BigInteger sn = new BigInteger(64, new SecureRandom());
+    X500Name owner = new X500Name(dn);
       
-        info.set(X509CertInfo.VALIDITY, interval);
-        info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(sn));
-        info.set(X509CertInfo.SUBJECT, new CertificateSubjectName(owner));
-        info.set(X509CertInfo.ISSUER, new CertificateIssuerName(owner));
-        info.set(X509CertInfo.KEY, new CertificateX509Key(pair.getPublic()));
-        info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
-        AlgorithmId algo = new AlgorithmId(AlgorithmId.md5WithRSAEncryption_oid);
-        info.set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algo));
-      
-        // Sign the cert to identify the algorithm that's used.
-        X509CertImpl cert = new X509CertImpl(info);
-        cert.sign(privkey, algorithm);
-      
-        // Update the algorith, and resign.
-        algo = (AlgorithmId)cert.get(X509CertImpl.SIG_ALG);
-        info.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, algo);
-        cert = new X509CertImpl(info);
-        cert.sign(privkey, algorithm);
-        return cert;
-      }
+    info.set(X509CertInfo.VALIDITY, interval);
+    info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(sn));
+    info.set(X509CertInfo.SUBJECT, new CertificateSubjectName(owner));
+    info.set(X509CertInfo.ISSUER, new CertificateIssuerName(owner));
+    info.set(X509CertInfo.KEY, new CertificateX509Key(pair.getPublic()));
+    info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
+    AlgorithmId algo = new AlgorithmId(AlgorithmId.md5WithRSAEncryption_oid);
+    info.set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algo));
+    
+    // Sign the cert to identify the algorithm that's used.
+    X509CertImpl cert = new X509CertImpl(info);
+    cert.sign(privkey, algorithm);
+    
+    // Update the algorith, and resign.
+    algo = (AlgorithmId)cert.get(X509CertImpl.SIG_ALG);
+    info.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, algo);
+    cert = new X509CertImpl(info);
+    cert.sign(privkey, algorithm);
+    return cert;
+  }
 
-  protected void createKeystore(String filename, String keystoreType) {
+  protected void createKeystore(String filename, String keystoreType) throws KeystoreServiceException {
     try {
       FileOutputStream out = new FileOutputStream( filename );
       KeyStore ks = KeyStore.getInstance(keystoreType);  
       ks.load( null, null );  
       ks.store( out, masterService.getMasterSecret() );
     } catch (KeyStoreException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to create the keystore.", e);
     } catch (NoSuchAlgorithmException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to create the keystore.", e);
     } catch (CertificateException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to create the keystore.", e);
     } catch (FileNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to create the keystore.", e);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to create the keystore.", e);
     }
   }
 
-  protected boolean isKeystoreAvailable(final File keyStoreFile, String storeType)
-      throws KeyStoreException, IOException {
-        if ( keyStoreFile.exists() )
-        {
-          FileInputStream input = null;
-          try {
-            final KeyStore  keyStore = KeyStore.getInstance(storeType);
-            input   = new FileInputStream( keyStoreFile );
-            keyStore.load( input, masterService.getMasterSecret() );
-            return true;
-          } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          } catch (CertificateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw e;
-          } catch (KeyStoreException e) {
-            e.printStackTrace();
-            throw e;
-          }
-          finally {
-              try {
-                input.close();
-              } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-              }
-          }
-        }
-        return false;
+  protected boolean isKeystoreAvailable(final File keyStoreFile, String storeType) throws KeyStoreException, IOException {
+    if ( keyStoreFile.exists() )
+    {
+      FileInputStream input = null;
+      try {
+        final KeyStore  keyStore = KeyStore.getInstance(storeType);
+        input   = new FileInputStream( keyStoreFile );
+        keyStore.load( input, masterService.getMasterSecret() );
+        return true;
+      } catch (NoSuchAlgorithmException e) {
+        throw new KeystoreService("Problem checking for keystore.", e);
+      } catch (CertificateException e) {
+        throw new KeystoreService("Problem checking for keystore.", e);
+      } catch (IOException e) {
+        throw e;
+      } catch (KeyStoreException e) {
+        throw e;
       }
+      finally {
+          try {
+            input.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+      }
+    }
+    return false;
+  }
 
-  protected KeyStore getKeystore(final File keyStoreFile, String storeType) {
+  protected KeyStore getKeystore(final File keyStoreFile, String storeType) throws KeystoreServiceException {
     KeyStore credStore = null;
     try {
       credStore = loadKeyStore( keyStoreFile, masterService.getMasterSecret(), storeType);
     } catch (CertificateException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+		throw new KeystoreServiceException("Unable to get the keystore.", e);
     } catch (KeyStoreException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+		throw new KeystoreServiceException("Unable to get the keystore.", e);
     } catch (NoSuchAlgorithmException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+		throw new KeystoreServiceException("Unable to get the keystore.", e);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+		throw new KeystoreServiceException("Unable to get the keystore.", e);
     }
     return credStore;
   }
@@ -207,17 +191,15 @@ public class BaseKeystoreService {
     super();
   }
 
-  protected void addCredential(String alias, String value, KeyStore ks) {
+  protected void addCredential(String alias, String value, KeyStore ks) throws KeystoreServiceException {
     if (ks != null) {
       try {
         final Key key = new SecretKeySpec(value.getBytes("UTF8"), "AES");
         ks.setKeyEntry( alias, key, masterService.getMasterSecret(), null);
       } catch (KeyStoreException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+		throw new KeystoreServiceException("Unable to add credential to credential store.", e);
       } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+		throw new KeystoreServiceException("Unable to add credential to credential store.", e);
       }
     }
   }
@@ -227,13 +209,10 @@ public class BaseKeystoreService {
       try {
         credential = new String(ks.getKey(alias, masterService.getMasterSecret()).getEncoded()).toCharArray();
       } catch (UnrecoverableKeyException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (KeyStoreException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (NoSuchAlgorithmException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
     }
@@ -241,17 +220,17 @@ public class BaseKeystoreService {
   }
 
   protected void writeKeystoreToFile(final KeyStore keyStore, final File file)
-      throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-     // TODO: backup the keystore on disk before attempting a write and restore on failure
-     final FileOutputStream  out = new FileOutputStream(file);
-     try
-     {
-         keyStore.store( out, masterService.getMasterSecret());
-     }
-     finally
-     {
-         out.close();
-     }
+    throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+    // TODO: backup the keystore on disk before attempting a write and restore on failure
+    final FileOutputStream  out = new FileOutputStream(file);
+    try
+    {
+      keyStore.store( out, masterService.getMasterSecret());
+    }
+    finally
+    {
+      out.close();
+    }
   }
 
   public void setMasterService(MasterService ms) {

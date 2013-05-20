@@ -37,7 +37,7 @@ import org.apache.hadoop.cmf.MasterService;
 
 public class CMFKeystoreService extends BaseKeystoreService implements KeystoreService {
 
-  private static final String TEST_CERT_DN = "CN=hadoop,OU=Test,O=Hadoop,L=Test,ST=Test,C=US";
+  private static final String SS_CERT_DN = "CN=hadoop,OU=Test,O=Hadoop,L=Test,ST=Test,C=US";
   private static final String CREDENTIALS_SUFFIX = "-credentials.jceks";
 
   private String serviceName = null;
@@ -53,23 +53,29 @@ public class CMFKeystoreService extends BaseKeystoreService implements KeystoreS
     }
   }
 
-  public void createKeystore() {
+  public void createKeystore() throws KeystoreServiceException {
     String filename = keyStoreDir + serviceName + ".jks";
     createKeystore(filename, "JKS");
   }
 
   public KeyStore getKeystore() {
     final File  keyStoreFile = new File( keyStoreDir + serviceName  );
-    return getKeystore(keyStoreFile, "JKS");
+	try {
+	  return getKeystore(keyStoreFile, "JKS");
+	}
+	catch (Exception e) {
+	  e.printStackTrace();
+	}
+    return null;
   }
   
-  public void addSelfSignedCert(String alias, char[] passphrase) {
+  public void addSelfSignedCert(String alias, char[] passphrase) throws KeystoreServiceException {
     KeyPairGenerator keyPairGenerator;
     try {
       keyPairGenerator = KeyPairGenerator.getInstance("RSA");
       keyPairGenerator.initialize(1024);  
       KeyPair KPair = keyPairGenerator.generateKeyPair();
-      X509Certificate cert = generateCertificate(TEST_CERT_DN, KPair, 365, "SHA1withRSA");
+      X509Certificate cert = generateCertificate(SS_CERT_DN, KPair, 365, "SHA1withRSA");
 
       KeyStore privateKS = getKeystore();
       privateKS.setKeyEntry(alias, KPair.getPrivate(),  
@@ -78,18 +84,15 @@ public class CMFKeystoreService extends BaseKeystoreService implements KeystoreS
       
       writeKeystoreToFile(privateKS, new File( keyStoreDir + serviceName  ));
     } catch (NoSuchAlgorithmException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to add self signed cert.",e);
     } catch (GeneralSecurityException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to add self signed cert.",e);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to add self signed cert.",e);
     }  
   }
   
-  public void createCredentialStore() {
+  public void createCredentialStore() throws KeystoreServiceException {
     String filename = keyStoreDir + serviceName + CREDENTIALS_SUFFIX;
     createKeystore(filename, "JCEKS");
   }
@@ -99,10 +102,8 @@ public class CMFKeystoreService extends BaseKeystoreService implements KeystoreS
     try {
       return isKeystoreAvailable(keyStoreFile, "JCEKS");
     } catch (KeyStoreException e) {
-      e.printStackTrace();
       throw new KeystoreServiceException(e);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       throw new KeystoreServiceException(e);
     }
   }
@@ -125,13 +126,10 @@ public class CMFKeystoreService extends BaseKeystoreService implements KeystoreS
       try {
         key = ks.getKey(alias, passphrase);
       } catch (UnrecoverableKeyException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (KeyStoreException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (NoSuchAlgorithmException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
     }
@@ -140,27 +138,29 @@ public class CMFKeystoreService extends BaseKeystoreService implements KeystoreS
   
   public KeyStore getCredentialStore() {
     final File  keyStoreFile = new File( keyStoreDir + serviceName + CREDENTIALS_SUFFIX  );
-    return getKeystore(keyStoreFile, "JCEKS");
+    try {
+      return getKeystore(keyStoreFile, "JCEKS");
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
-  public void addCredential(String alias, String value) {
-    KeyStore ks = getCredentialStore();
-    addCredential(alias, value, ks);
-    final File  keyStoreFile = new File( keyStoreDir + serviceName + CREDENTIALS_SUFFIX  );
+  public void addCredential(String alias, String value) throws KeystoreServiceException {
     try {
+	  KeyStore ks = getCredentialStore();
+	  addCredential(alias, value, ks);
+	  final File  keyStoreFile = new File( keyStoreDir + serviceName + CREDENTIALS_SUFFIX  );
       writeKeystoreToFile(ks, keyStoreFile);
     } catch (KeyStoreException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to add credential.",e);
     } catch (NoSuchAlgorithmException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to add credential.",e);
     } catch (CertificateException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to add credential.",e);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new KeystoreServiceException("Unable to add credential.",e);
     }
   }
 

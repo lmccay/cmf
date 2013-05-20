@@ -27,8 +27,9 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ntp.TimeStamp;
-import org.apache.hadoop.gateway.services.security.EncryptionResult;
+import org.apache.hadoop.cmf.EncryptionResult;
 import org.apache.hadoop.cmf.MasterServiceException;
+import org.apache.hadoop.cmf.KeystoreServiceException;
 import org.apache.hadoop.cmf.MasterService;
 
 public class CMFMasterService implements MasterService {
@@ -58,7 +59,6 @@ public class CMFMasterService implements MasterService {
       try {
         initializeFromMaster(masterFile);
       } catch (Exception e) {
-        // TODO Auto-generated catch block
         throw new MasterServiceException("Unable to load the persisted master secret.", e);
       }
     }
@@ -141,50 +141,48 @@ public class CMFMasterService implements MasterService {
     try {
       return aes.encrypt(new String(master));
     } catch (Exception e) {
-      // TODO log failed encryption attempt
-      // need to ensure that we don't persist now
-      e.printStackTrace();
+		e.printStackTrace();
     }
     return null;
   }
 
   private void initializeFromMaster(File masterFile) throws Exception {
-      try {
-        List<String> lines = FileUtils.readLines(masterFile, "UTF8");
-        String tag = lines.get(0);
-        // TODO: log - if appropriate - at least at finest level
-        System.out.println("Loading from persistent master: " + tag);
-        String line = new String(Base64.decodeBase64(lines.get(1)));
-        String[] parts = line.split("::");
-        this.master = new String(aes.decrypt(Base64.decodeBase64(parts[0]), Base64.decodeBase64(parts[1]), Base64.decodeBase64(parts[2])), "UTF8").toCharArray();
-      } catch (IOException e) {
-        e.printStackTrace();
-        throw e;
-      } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        throw e;
-      }
+    try {
+      List<String> lines = FileUtils.readLines(masterFile, "UTF8");
+      String tag = lines.get(0);
+      // TODO: log - if appropriate - at least at finest level
+      System.out.println("Loading from persistent master: " + tag);
+      String line = new String(Base64.decodeBase64(lines.get(1)));
+      String[] parts = line.split("::");
+      this.master = new String(aes.decrypt(Base64.decodeBase64(parts[0]), Base64.decodeBase64(parts[1]), Base64.decodeBase64(parts[2])), "UTF8").toCharArray();
+    } catch (IOException e) {
+      throw e;
+    } catch (KeystoreServiceException e) {
+      throw e;
+    } catch (MasterServiceException e) {
+      throw e;
+    } catch (Exception e) {
+      throw e;
     }
-
-  private void chmod(String args, File file) throws IOException {
-      // TODO: move to Java 7 NIO support to add windows as well
-      // TODO: look into the following for Windows: Runtime.getRuntime().exec("attrib -r myFile");
-      if (isUnixEnv()) {
-          //args and file should never be null.
-          if (args == null || file == null) 
-            throw new IOException("nullArg");
-          if (!file.exists()) 
-            throw new IOException("fileNotFound");
+  }
   
-          // " +" regular expression for 1 or more spaces
-          final String[] argsString = args.split(" +");
-          List<String> cmdList = new ArrayList<String>();
-          cmdList.add("/bin/chmod");
-          cmdList.addAll(Arrays.asList(argsString));
-          cmdList.add(file.getAbsolutePath());
-          new ProcessBuilder(cmdList).start();
-      }
+  private void chmod(String args, File file) throws IOException, IllegalArgumentException {
+    // TODO: move to Java 7 NIO support to add windows as well
+    // TODO: look into the following for Windows: Runtime.getRuntime().exec("attrib -r myFile");
+    if (isUnixEnv()) {
+	  if (file == null || args == null)
+		throw new IllegalArgumentException("Arguments and File parameters must not be null.");
+      if (!file.exists()) 
+        throw new IOException("fileNotFound");
+      
+      // " +" regular expression for 1 or more spaces
+      final String[] argsString = args.split(" +");
+      List<String> cmdList = new ArrayList<String>();
+      cmdList.add("/bin/chmod");
+      cmdList.addAll(Arrays.asList(argsString));
+      cmdList.add(file.getAbsolutePath());
+      new ProcessBuilder(cmdList).start();
+    }
   }
 
   private boolean isUnixEnv() {

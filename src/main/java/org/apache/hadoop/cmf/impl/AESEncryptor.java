@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.cmf.impl;
 
+import org.apache.hadoop.cmf.EncryptionResult;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -32,8 +33,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.hadoop.gateway.services.security.EncryptionResult;
 
 public class AESEncryptor {
   
@@ -62,19 +61,14 @@ public class AESEncryptor {
         byte[] iv = ecipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
         dcipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
       } catch (NoSuchAlgorithmException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (NoSuchPaddingException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (InvalidKeyException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (InvalidParameterSpecException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       } catch (InvalidAlgorithmParameterException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
   }
@@ -90,19 +84,14 @@ public class AESEncryptor {
       byte[] iv = ecipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
       dcipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
     } catch (NoSuchAlgorithmException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (NoSuchPaddingException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (InvalidKeyException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (InvalidParameterSpecException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (InvalidAlgorithmParameterException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
@@ -119,10 +108,8 @@ public class AESEncryptor {
       KeySpec spec = new PBEKeySpec(passPhrase.toCharArray(), salt, ITERATION_COUNT, KEY_LENGTH);
       key = factory.generateSecret(spec);
     } catch (NoSuchAlgorithmException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (InvalidKeySpecException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     
