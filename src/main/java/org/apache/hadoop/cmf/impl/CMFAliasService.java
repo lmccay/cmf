@@ -36,6 +36,10 @@ public class CMFAliasService implements AliasService {
 
   private KeystoreService keystoreService;
 
+  public CMFAliasService(KeystoreService ks) {
+	setKeystoreService(ks);
+  }
+  
   @Override
   public char[] getPasswordFromAlias(String alias) {
     return getPasswordFromAlias(alias, false);

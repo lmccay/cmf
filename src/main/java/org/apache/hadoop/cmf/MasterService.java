@@ -19,6 +19,7 @@ package org.apache.hadoop.cmf;
 
 public interface MasterService {
 
-  public abstract char[] getMasterSecret();
+  void setupMasterSecret(String securityDir, boolean persisting) throws MasterServiceException;
+  char[] getMasterSecret();
 
 }

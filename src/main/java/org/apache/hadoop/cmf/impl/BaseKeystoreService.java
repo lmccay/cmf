@@ -58,6 +58,10 @@ public class BaseKeystoreService {
   protected MasterService masterService;
   protected String keyStoreDir;
 
+  public BaseKeystoreService(MasterService ms) {
+	setMasterService(ms);
+  }
+
   private static KeyStore loadKeyStore(final File keyStoreFile, final char[] masterPassword, String storeType)
       throws CertificateException, IOException, KeyStoreException,
       NoSuchAlgorithmException {     

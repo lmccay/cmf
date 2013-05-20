@@ -19,20 +19,18 @@ public class CMFBootstrapService {
 		this.keystoreDir = keystoreDir;
 		ms = new CMFMasterService(serviceName);
 		try {
-			ks = new CMFKeystoreService(keystoreDir, serviceName);
-			((CMFKeystoreService)ks).setMasterService(ms);
+			ks = new CMFKeystoreService(keystoreDir, serviceName, ms);
 		}
 		catch(KeystoreServiceException kse) {
 		}
-		as = new CMFAliasService();
-		((CMFAliasService)as).setKeystoreService(ks);
+		as = new CMFAliasService(ks);
 	}
 	
 	public void start(boolean persist) {
 		try {
-			((CMFMasterService)ms).setupMasterSecret(securityDir, persist);
+			ms.setupMasterSecret(securityDir, persist);
 			if (!ks.isCredentialStoreAvailable()) {
-				((CMFKeystoreService)ks).createCredentialStore();
+				ks.createCredentialStore();
 			}
 		}
 		catch(KeystoreServiceException kse) {

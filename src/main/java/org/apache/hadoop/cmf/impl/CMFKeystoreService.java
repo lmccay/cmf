@@ -32,6 +32,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.hadoop.cmf.KeystoreServiceException;
 import org.apache.hadoop.cmf.KeystoreService;
+import org.apache.hadoop.cmf.MasterService;
 
 
 public class CMFKeystoreService extends BaseKeystoreService implements KeystoreService {
@@ -41,8 +42,9 @@ public class CMFKeystoreService extends BaseKeystoreService implements KeystoreS
 
   private String serviceName = null;
   
-  public CMFKeystoreService(String keystoreDir, String serviceName)
+  public CMFKeystoreService(String keystoreDir, String serviceName, MasterService ms)
       throws KeystoreServiceException {
+	super(ms);
     this.serviceName = serviceName;
     this.keyStoreDir = keystoreDir + File.separator;
     File ksd = new File(this.keyStoreDir);

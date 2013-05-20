@@ -48,19 +48,17 @@ public class CMFTest
   		// init
 		ms = new TestCMFMasterService("test");
 		try {
-			ks = new CMFKeystoreService(".", "test");
-			((CMFKeystoreService)ks).setMasterService(ms);
+			ks = new CMFKeystoreService(".", "test", ms);
 		}
 		catch(KeystoreServiceException kse) {
 		}
-		as = new CMFAliasService();
-		((CMFAliasService)as).setKeystoreService(ks);
+		as = new CMFAliasService(ks);
 		
 		// start
 		try {
-			((TestCMFMasterService)ms).setupMasterSecret(".", true);
+			ms.setupMasterSecret(".", true);
 			if (!ks.isCredentialStoreAvailable()) {
-				((CMFKeystoreService)ks).createCredentialStore();
+				ks.createCredentialStore();
 			}
 		}
 		catch(KeystoreServiceException kse) {
