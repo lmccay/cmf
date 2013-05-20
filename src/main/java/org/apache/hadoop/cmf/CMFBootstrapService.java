@@ -47,23 +47,6 @@ public class CMFBootstrapService {
 	public void destroy() {
 	}
 	
-	public static void main(String[] args) {
-		CMFBootstrapService boot = new CMFBootstrapService();
-		boot.init(".", ".", args[0]);
-		boot.start(true);
-
-		// test aliases
-		boot.as.generateAlias("test");
-		System.out.println("test alias secret: " + new String(boot.as.getPasswordFromAlias("test")));
-		
-		// test config elements
-		System.out.println(boot.as.getPasswordFromConfigValue("${ALIAS=test}"));
-		System.out.println(boot.as.getPasswordFromConfigValue("cleartext"));
-
-		boot.stop();
-		boot.destroy();
-	}
-	
 	public AliasService getAliasService() {
 		return as;
 	}
