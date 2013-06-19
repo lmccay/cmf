@@ -17,12 +17,12 @@
  */
 package org.apache.hadoop.security.cmf;
 
-import org.apache.hadoop.cmf.MasterService;
-import org.apache.hadoop.cmf.KeystoreService;
-import org.apache.hadoop.cmf.AliasService;
-import org.apache.hadoop.cmf.impl.CMFAliasService;
-import org.apache.hadoop.cmf.impl.CMFMasterService;
-import org.apache.hadoop.cmf.impl.CMFKeystoreService;
+import org.apache.hadoop.security.cmf.MasterService;
+import org.apache.hadoop.security.cmf.KeystoreService;
+import org.apache.hadoop.security.cmf.AliasService;
+import org.apache.hadoop.security.cmf.impl.CMFAliasService;
+import org.apache.hadoop.security.cmf.impl.CMFMasterService;
+import org.apache.hadoop.security.cmf.impl.CMFKeystoreService;
 
 /**
 * This is a simple example of a service to bootstrap the CMF framework.

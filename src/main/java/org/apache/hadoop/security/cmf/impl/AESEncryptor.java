@@ -17,7 +17,7 @@
  */
 package org.apache.hadoop.security.cmf.impl;
 
-import org.apache.hadoop.cmf.EncryptionResult;
+import org.apache.hadoop.security.cmf.EncryptionResult;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

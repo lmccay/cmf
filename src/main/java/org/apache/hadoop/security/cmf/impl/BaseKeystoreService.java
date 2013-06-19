@@ -38,9 +38,9 @@ import java.util.Date;
 
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.hadoop.cmf.MasterService;
-import org.apache.hadoop.cmf.KeystoreService;
-import org.apache.hadoop.cmf.KeystoreServiceException;
+import org.apache.hadoop.security.cmf.MasterService;
+import org.apache.hadoop.security.cmf.KeystoreService;
+import org.apache.hadoop.security.cmf.KeystoreServiceException;
 
 import sun.security.x509.AlgorithmId;
 import sun.security.x509.CertificateAlgorithmId;

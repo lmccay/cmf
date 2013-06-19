@@ -30,9 +30,9 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import org.apache.hadoop.cmf.KeystoreServiceException;
-import org.apache.hadoop.cmf.KeystoreService;
-import org.apache.hadoop.cmf.MasterService;
+import org.apache.hadoop.security.cmf.KeystoreServiceException;
+import org.apache.hadoop.security.cmf.KeystoreService;
+import org.apache.hadoop.security.cmf.MasterService;
 
 
 public class CMFKeystoreService extends BaseKeystoreService implements KeystoreService {

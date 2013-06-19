@@ -27,10 +27,10 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ntp.TimeStamp;
-import org.apache.hadoop.cmf.EncryptionResult;
-import org.apache.hadoop.cmf.MasterServiceException;
-import org.apache.hadoop.cmf.KeystoreServiceException;
-import org.apache.hadoop.cmf.MasterService;
+import org.apache.hadoop.security.cmf.EncryptionResult;
+import org.apache.hadoop.security.cmf.MasterServiceException;
+import org.apache.hadoop.security.cmf.KeystoreServiceException;
+import org.apache.hadoop.security.cmf.MasterService;
 
 public class CMFMasterService implements MasterService {
 

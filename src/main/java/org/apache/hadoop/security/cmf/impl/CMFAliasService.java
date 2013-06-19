@@ -22,9 +22,9 @@ import java.security.KeyStore;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.hadoop.cmf.AliasService;
-import org.apache.hadoop.cmf.KeystoreService;
-import org.apache.hadoop.cmf.KeystoreServiceException;
+import org.apache.hadoop.security.cmf.AliasService;
+import org.apache.hadoop.security.cmf.KeystoreService;
+import org.apache.hadoop.security.cmf.KeystoreServiceException;
 
 public class CMFAliasService implements AliasService {
 

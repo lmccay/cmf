@@ -29,8 +29,8 @@ import java.io.FileInputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
-import org.apache.hadoop.cmf.*;
-import org.apache.hadoop.cmf.impl.*;
+import org.apache.hadoop.security.cmf.*;
+import org.apache.hadoop.security.cmf.impl.*;
 
 /**
  * Unit test for simple App.
